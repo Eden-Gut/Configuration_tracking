@@ -76,9 +76,9 @@ if prev_file and argo_file and vbac_file:
                            'Gate 5.5 plan','Gate 5.5 actual','Gate 6.5 plan','Gate 6.5 actual']]
 
         # ===== Excel Formatting =====
-        wb = Workbook()
-        ws = wb.active
-        ws.title = "Configuration tracking"
+        # Load the original workbook and update the data
+        wb = load_workbook(prev_file)
+        ws = wb['Configuration tracking']
 
         border_style = Border(left=Side(border_style='thin', color='000000'),
                               right=Side(border_style='thin', color='000000'),
