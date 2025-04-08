@@ -145,3 +145,4 @@ if prev_file and argo_file and vbac_file:
             data=output,
             file_name="Configuration_tracking_formatted.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
