@@ -6,34 +6,25 @@ from openpyxl.styles import Border, Side, PatternFill, Alignment, Font
 from openpyxl.utils import get_column_letter
 from openpyxl.utils.dataframe import dataframe_to_rows
 
-st.set_page_config(page_title="Configuration Tracking", layout="wide", page_icon=":clipboard:")
+# ===== Title and Description =====
+st.markdown(
+    "<h1 style='text-align: center; color: #4B0082;'>Configuration Tracking File Generator</h1>",
+    unsafe_allow_html=True
+)
 
-# KLA styling
-st.markdown("""
-<style>
-    .reportview-container .main .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-    }
-    .sidebar .sidebar-content {
-        background-color: #005FAE;
-        color: white;
-    }
-    .css-1aumxhk {
-        background-color: #005FAE !important;
-        color: white !important;
-    }
-</style>
-""", unsafe_allow_html=True)
+st.markdown(
+    "<p style='text-align: center; color: #4682B4;'>Upload the required files, click 'Run Processing', and download the updated file.</p>",
+    unsafe_allow_html=True
+)
 
-st.title("Configuration Tracking Dashboard")
-
-# File upload
-prev_file = st.file_uploader("1. Upload previous configuration file", type="xlsx")
-argo_file = st.file_uploader("2. Upload Argo file", type="xlsx")
-vbac_file = st.file_uploader("3. Upload VBAC/VBAP file", type="xlsx")
+# ===== File Uploads =====
+prev_file = st.file_uploader("Upload previous configuration file", type=["xlsx"])
+argo_file = st.file_uploader("Upload Argo file", type=["xlsx"])
+vbac_file = st.file_uploader("Upload VBAC/VBAP file", type=["xlsx"])
 
 if prev_file and argo_file and vbac_file:
+    st.success("All files uploaded successfully!")
+
     if st.button("Run Processing"):
         prev_excel = pd.ExcelFile(prev_file)
         prev = pd.read_excel(prev_excel, sheet_name='Configuration tracking')
@@ -41,7 +32,7 @@ if prev_file and argo_file and vbac_file:
         argo = pd.read_excel(argo_file)
         vbac = pd.read_excel(vbac_file)
 
-        # Process
+        # ===== Data Processing =====
         prev['CT'] = ""
         ct['Build Product'] = ct['Build Product'].str.upper()
         argo = argo[argo['Division'] == 'PCB']
@@ -84,17 +75,15 @@ if prev_file and argo_file and vbac_file:
                            'Configuration Note','Gate 2.7 plan','Gate 2.7 actual','Gate 3.5 plan','Gate 3.5 actual',
                            'Gate 5.5 plan','Gate 5.5 actual','Gate 6.5 plan','Gate 6.5 actual']]
 
-        # Excel formatting
+        # ===== Excel Formatting =====
         wb = Workbook()
         ws = wb.active
         ws.title = "Configuration tracking"
 
-        border_style = Border(
-            left=Side(border_style='thin', color='000000'),
-            right=Side(border_style='thin', color='000000'),
-            top=Side(border_style='thin', color='000000'),
-            bottom=Side(border_style='thin', color='000000')
-        )
+        border_style = Border(left=Side(border_style='thin', color='000000'),
+                              right=Side(border_style='thin', color='000000'),
+                              top=Side(border_style='thin', color='000000'),
+                              bottom=Side(border_style='thin', color='000000'))
 
         fill_blue = PatternFill(start_color='B8CCE4', end_color='c0ded9', fill_type='solid')
         fill_green = PatternFill(start_color='d9ecd0', end_color='d9ecd0', fill_type='solid')
@@ -109,15 +98,16 @@ if prev_file and argo_file and vbac_file:
                 cell.alignment = Alignment(horizontal='center')
 
                 if r_idx == 1:
-                    if c_idx in [24, 25]:  # X, Y
+                    if c_idx in [24, 25]:  # Columns X, Y
                         cell.fill = fill_pink
-                    elif c_idx == 26:  # Z
+                    elif c_idx == 26:      # Column Z
                         cell.fill = fill_orange
-                    elif c_idx in [29, 31, 33, 35, 37]:  # AC, AE...
+                    elif c_idx in [29, 31, 33, 35, 37]:  # AC, AE, AG...
                         cell.fill = fill_green
                     else:
                         cell.fill = fill_blue
 
+        # Adjust column widths
         for col in ws.columns:
             max_len = 0
             col = list(col)
@@ -129,20 +119,25 @@ if prev_file and argo_file and vbac_file:
                     pass
             ws.column_dimensions[get_column_letter(col[0].column)].width = max_len + 2
 
+        # Add formulas
         for row in range(2, len(main_df) + 2):
             ws[f'AB{row}'] = f'=IF(ISBLANK(X{row}), "", X{row} + 7)'
             ws[f'AD{row}'] = f'=IF(ISBLANK(AC{row}), "", AC{row} + 14)'
             ws[f'AF{row}'] = f'=IF(OR(ISBLANK(Z{row}), ISBLANK(S{row})), "", S{row} - Z{row} - 14)'
             ws[f'AH{row}'] = f'=IF(ISBLANK(S{row}), "", S{row} - 10)'
 
+        # Save to memory and offer download
         output = BytesIO()
         wb.save(output)
         output.seek(0)
 
-        st.success("Processing complete! Download the updated file below:")
+        st.success("File processed successfully and ready to download.")
         st.download_button(
-            label="Download Excel File",
+            label="Download Updated File",
             data=output,
-            file_name="Configuration_tracking_formatted.xlsx",
+            file_name="Configuration_tracking_updated.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
+
+else:
+    st.info("Please upload all three files to continue.")
