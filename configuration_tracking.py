@@ -7,7 +7,7 @@ from openpyxl.utils import get_column_letter
 from openpyxl.utils.dataframe import dataframe_to_rows
 import tempfile
 import numpy as np
-from datetime import datetime
+import datetime
 from openpyxl import load_workbook
 # ===== Title and Description =====
 st.markdown(
@@ -144,7 +144,7 @@ if prev_file and argo_file and vbac_file:
         st.download_button(
             label="Download Updated File",
             data=output,
-            file_name="Configuration_tracking_updated.xlsx",
+            file_name=new_file_name,
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
