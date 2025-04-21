@@ -133,6 +133,12 @@ if prev_file and argo_file and vbac_file:
         output = BytesIO()
         wb.save(output)
         output.seek(0)
+        
+        # Get today's date
+        today_date = datetime.datetime.today().strftime('%Y-%m-%d')
+
+        # Create the new file name with today's date
+        new_file_name = f"Configuration_tracking_{today_date}.xlsx"
 
         st.success("File processed successfully and ready to download.")
         st.download_button(
