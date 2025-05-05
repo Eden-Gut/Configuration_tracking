@@ -115,15 +115,17 @@ if prev_file and argo_file and vbac_file and sales_file:
                     cell.font = Font(name='Calibri', size=10)
                     cell.alignment = Alignment(horizontal='center')
 
-                    if r_idx == 1:
-                        if c_idx in [24, 25]:
-                            cell.fill = fill_pink
-                        elif c_idx == 26:
-                            cell.fill = fill_orange
-                        elif c_idx in [29, 31, 33, 35, 37]:
-                            cell.fill = fill_green
-                        else:
-                            cell.fill = fill_blue
+                   if r_idx == 0:
+                       if c_idx in [23, 24]:  # Columns X, Y
+                           cell.fill = fill_pink
+                       elif c_idx == 25:  # Column Z
+                           cell.fill = fill_yellow
+                       elif c_idx == 22:  # Column W
+                           cell.fill = fill_orange
+                       elif c_idx in [28, 30, 32, 34, 36]:  # Columns AC, AE, AG, AI
+                           cell.fill = fill_green
+                       else:
+                           cell.fill = fill_blue
                     else:
                         argo_id = row[0]
                         if argo_id not in prev_df['Argo ID'].values:
