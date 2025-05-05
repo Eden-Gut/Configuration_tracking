@@ -115,7 +115,7 @@ if prev_file and argo_file and vbac_file and sales_file:
                     cell.font = Font(name='Calibri', size=10)
                     cell.alignment = Alignment(horizontal='center')
 
-                   if r_idx == 0:
+                    if r_idx == 0:
                        if c_idx in [23, 24]:  # Columns X, Y
                            cell.fill = fill_pink
                        elif c_idx == 25:  # Column Z
